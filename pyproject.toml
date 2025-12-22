@@ -1,0 +1,13 @@
+[project]
+name = "dashboard"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.4.0",
+    "streamlit>=1.52.2",
+    "tensorflow>=2.20.0",
+    "tf-keras>=2.20.1",
+    "transformers>=4.57.3",
+]
