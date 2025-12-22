@@ -118,15 +118,3 @@ http://localhost:8501
 Pengguna dapat memasukkan teks dan memilih model untuk melihat hasil klasifikasi emosi secara langsung.
 
 ---
-
-## 📌 Catatan
-
-Proyek ini dikembangkan untuk keperluan **akademik dan penelitian** di bidang **Natural Language Processing (NLP)** dan **Data Science**.
-
-```
-
-Kalau mau, aku bisa lanjutkan dengan:
-- versi **bahasa Inggris**
-- versi **lebih singkat (aman sidang)**
-- atau menyesuaikan redaksi agar **sinkron dengan skripsi/jurnal kamu**
-```
