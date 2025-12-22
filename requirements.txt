@@ -1,0 +1,35 @@
+# Core
+python>=3.9
+
+# Data Processing
+numpy
+pandas
+scikit-learn
+
+# Deep Learning
+tensorflow>=2.12
+keras
+
+# NLP & Transformer
+transformers
+datasets
+torch
+evaluate
+accelerate
+huggingface-hub
+
+# Text Preprocessing
+nltk
+regex
+
+# Visualization
+matplotlib
+seaborn
+
+# Web App
+streamlit
+Pillow
+
+# Utilities
+tqdm
+joblib
