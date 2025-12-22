@@ -1,123 +1,83 @@
+Siap.
+Berikut **README.md dalam 1 cell utuh**, **siap copy–paste langsung** tanpa perlu edit apa pun.
 
----
-
-```md
+````md
 # 🧠 Klasifikasi Deteksi Emosi pada Teks
 
-![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-Deep%20Learning-orange)
-![NLP](https://img.shields.io/badge/NLP-Emotion%20Classification-green)
-![Streamlit](https://img.shields.io/badge/Streamlit-Web%20App-red)
-
 ## 📌 Deskripsi Proyek
-Proyek ini berfokus pada **klasifikasi deteksi emosi pada teks** menggunakan pendekatan **Deep Learning dan Transformer-based Models**. Sistem dirancang untuk mengidentifikasi emosi dari teks (tweet) ke dalam empat kelas utama, yaitu:
+Proyek ini bertujuan untuk melakukan **klasifikasi deteksi emosi pada teks** menggunakan pendekatan **Deep Learning dan Transformer-based Models**. Sistem ini mengklasifikasikan emosi dari teks (tweet) ke dalam empat kelas utama, yaitu **neutral**, **worry**, **happiness**, dan **sadness**.
 
-- **Neutral**
-- **Worry**
-- **Happiness**
-- **Sadness**
-
-Penelitian ini membandingkan performa tiga model berbeda, yaitu **Hybrid LSTM**, **DistilBERT**, dan **RoBERTa**, serta menyediakan **aplikasi website berbasis Streamlit** untuk pengujian secara interaktif.
-
----
-
-## 📂 Struktur Proyek
-```
-
-├── DistilBERTModel/        # Model DistilBERT tersimpan
-├── lstmhybridModel/        # Model Hybrid LSTM tersimpan
-├── RoBERTaModel/           # Model RoBERTa tersimpan
-├── app.py                  # Aplikasi Streamlit
-├── tweet_emotions.csv      # Dataset
-├── FIXUAP_PembelajaranMesin.ipynb
-├── requirements.txt
-└── README.md
-
-````
+Penelitian ini membandingkan performa tiga model berbeda, yaitu **Hybrid LSTM**, **DistilBERT**, dan **RoBERTa**. Selain itu, proyek ini juga menyediakan **aplikasi website berbasis Streamlit** agar pengguna dapat melakukan pengujian klasifikasi emosi secara interaktif.
 
 ---
 
 ## 📊 Dataset dan Preprocessing
 
 ### Dataset
-Dataset yang digunakan berupa **dataset tweet emosi** dengan berbagai label emosi. Untuk keperluan penelitian, dataset difilter sehingga hanya mencakup empat label emosi berikut:
+Dataset yang digunakan adalah **Emotion Detection from Text Dataset** yang tersedia secara publik di Kaggle:
 
+🔗 https://www.kaggle.com/datasets/pashupatigupta/emotion-detection-from-text
+
+Dataset ini berisi data teks berupa tweet yang telah diberi label emosi. Dari keseluruhan label yang tersedia, penelitian ini hanya menggunakan **empat kelas emosi**, yaitu:
 - `neutral`
 - `worry`
 - `happiness`
 - `sadness`
 
-### Tahapan Preprocessing
-Tahapan preprocessing yang dilakukan meliputi:
-1. **Seleksi label emosi**
-2. **Pembersihan teks**
-   - Menghapus URL, mention, hashtag
-   - Menghapus karakter khusus dan angka
-   - Mengubah teks menjadi huruf kecil
-3. **Tokenisasi**
-   - Tokenizer Transformer untuk DistilBERT dan RoBERTa
+Dataset **tidak disertakan langsung** dalam repository untuk menjaga ukuran repositori tetap ringan dan mengikuti praktik GitHub yang baik.
+
+### Preprocessing
+Tahapan preprocessing data teks yang dilakukan meliputi:
+1. Seleksi label emosi (hanya 4 kelas)
+2. Pembersihan teks (menghapus URL, mention, hashtag, karakter khusus, dan angka)
+3. Mengubah teks menjadi huruf kecil (lowercase)
+4. Tokenisasi  
+   - Tokenizer Transformer untuk DistilBERT dan RoBERTa  
    - Tokenizer Keras untuk Hybrid LSTM
-4. **Padding & Truncation**
-5. **Split data** (training dan testing)
+5. Padding dan truncation untuk menyeragamkan panjang input
+6. Pembagian data menjadi data latih dan data uji
 
 ---
 
 ## 🤖 Model yang Digunakan
 
 ### 1️⃣ Hybrid LSTM
-Model ini menggunakan **Embedding Layer** dan **Bidirectional LSTM** untuk menangkap pola urutan kata dalam teks.
+Model Hybrid LSTM menggunakan **Embedding Layer** dan **Bidirectional LSTM** untuk mempelajari pola urutan kata dalam teks. Model ini dilatih dari awal tanpa pretrained model dan digunakan sebagai **baseline** pembanding.
 
-**Karakteristik:**
-- Model non-pretrained
-- Digunakan sebagai baseline
-- Arsitektur sederhana dan ringan
-
-📁 Folder: `lstmhybridModel/`
+📁 Folder model: `lstmhybridModel/`
 
 ---
 
 ### 2️⃣ DistilBERT
-DistilBERT merupakan versi ringan dari BERT dengan performa yang tetap optimal untuk klasifikasi teks.
+DistilBERT merupakan versi ringan dari BERT yang tetap mempertahankan performa tinggi dengan jumlah parameter yang lebih sedikit. Model ini di-fine-tune untuk tugas klasifikasi emosi pada teks.
 
-**Karakteristik:**
-- Transformer-based
-- Lebih efisien dan cepat
-- Akurasi tinggi pada klasifikasi emosi
-
-📁 Folder: `DistilBERTModel/`
+📁 Folder model: `DistilBERTModel/`
 
 ---
 
 ### 3️⃣ RoBERTa
-RoBERTa adalah pengembangan dari BERT dengan optimasi pretraining yang menghasilkan performa NLP yang lebih kuat.
+RoBERTa adalah pengembangan dari BERT dengan optimasi pada proses pretraining sehingga mampu menghasilkan representasi bahasa yang lebih kuat dan stabil untuk klasifikasi teks.
 
-**Karakteristik:**
-- Representasi konteks lebih baik
-- Performa paling stabil
-- Cocok untuk analisis emosi berbasis teks
-
-📁 Folder: `RoBERTaModel/`
+📁 Folder model: `RoBERTaModel/`
 
 ---
 
-## 📈 Hasil Evaluasi dan Analisis
+## 📈 Hasil Evaluasi dan Analisis Perbandingan
 
-Evaluasi model dilakukan menggunakan **akurasi dan classification report**. Perbandingan hasil ketiga model ditunjukkan pada tabel berikut:
+Evaluasi model dilakukan menggunakan **akurasi dan classification report**. Tabel berikut menunjukkan perbandingan performa ketiga model:
 
-| Nama Model   | Akurasi     | Hasil Evaluasi |
+| Nama Model   | Akurasi    | Hasil Evaluasi |
 |-------------|------------|----------------|
-| Hybrid LSTM | Sedang     | Kesulitan menangani konteks kompleks dan kelas minoritas |
-| DistilBERT  | Tinggi     | Performa stabil dengan precision dan recall yang baik |
-| RoBERTa     | Tertinggi  | F1-score paling konsisten di seluruh kelas emosi |
+| Hybrid LSTM | Sedang     | Performa lebih rendah, terutama pada teks dengan konteks kompleks |
+| DistilBERT  | Tinggi     | Performa stabil dengan keseimbangan precision dan recall yang baik |
+| RoBERTa     | Tertinggi  | Memberikan performa terbaik dengan f1-score paling konsisten |
 
-### Analisis Singkat
-- **RoBERTa** memberikan performa terbaik secara keseluruhan
-- **DistilBERT** menjadi alternatif efisien dengan akurasi mendekati RoBERTa
-- **Hybrid LSTM** berfungsi sebagai baseline namun kurang optimal untuk teks kompleks
+### Analisis
+Model berbasis Transformer (**RoBERTa dan DistilBERT**) menunjukkan performa yang lebih baik dibandingkan Hybrid LSTM. **RoBERTa** memberikan hasil terbaik secara keseluruhan, sedangkan **DistilBERT** menjadi alternatif yang lebih efisien dengan performa mendekati RoBERTa.
 
 ---
 
-## 🌐 Panduan Menjalankan Website Secara Lokal
+## 🌐 Panduan Menjalankan Sistem Website Secara Lokal
 
 ### 1️⃣ Clone Repository
 ```bash
@@ -131,13 +91,23 @@ cd <nama-folder-project>
 pip install -r requirements.txt
 ```
 
-### 3️⃣ Jalankan Aplikasi
+### 3️⃣ Pastikan Model Tersedia
+
+Pastikan folder berikut sudah tersedia dan berisi model hasil training:
+
+```
+DistilBERTModel/
+lstmhybridModel/
+RoBERTaModel/
+```
+
+### 4️⃣ Jalankan Aplikasi Streamlit
 
 ```bash
 streamlit run app.py
 ```
 
-### 4️⃣ Akses Website
+### 5️⃣ Akses Website
 
 Buka browser dan akses:
 
@@ -149,25 +119,14 @@ Pengguna dapat memasukkan teks dan memilih model untuk melihat hasil klasifikasi
 
 ---
 
-## 🚀 Teknologi yang Digunakan
-
-* Python
-* TensorFlow / Keras
-* Hugging Face Transformers
-* Scikit-learn
-* Streamlit
-
----
-
 ## 📌 Catatan
 
-Proyek ini dikembangkan untuk keperluan **akademik dan penelitian** dalam bidang **Natural Language Processing (NLP)** dan **Data Science**.
+Proyek ini dikembangkan untuk keperluan **akademik dan penelitian** di bidang **Natural Language Processing (NLP)** dan **Data Science**.
 
----
+```
 
-## 👤 Author
-
-**Nizam Avif Anhari**
-Mahasiswa Data Science
-
----
+Kalau mau, aku bisa lanjutkan dengan:
+- versi **bahasa Inggris**
+- versi **lebih singkat (aman sidang)**
+- atau menyesuaikan redaksi agar **sinkron dengan skripsi/jurnal kamu**
+```
