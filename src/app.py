@@ -66,12 +66,11 @@ def load_lstm_model(model_path):
             full_path = os.path.join(model_path, files[0])
 
         # 2. DEFINISI CUSTOM OBJECTS (PATCHING KERAS 3 -> KERAS 2)
-        
         # Patch A: InputLayer (Mengatasi error 'batch_shape')
         from tensorflow.keras.layers import InputLayer
         class PatchedInputLayer(InputLayer):
             def __init__(self, batch_shape=None, dtype=None, **kwargs):
-                # Pindahkan batch_shape ke batch_input_shape (bahasa Keras 2)
+                # Keras 3 mungkin mengirim batch_shape & dtype, kita tangani sesuai Keras 2
                 if batch_shape is not None:
                     kwargs['batch_input_shape'] = batch_shape
                 # Abaikan dtype policy kompleks, ambil float32 default
@@ -156,13 +155,7 @@ if st.button("Analisis"):
             tok = load_lstm_tokenizer()
             if model and tok:
                 seq = tok.texts_to_sequences([user_input])
-                
-                # ❌ SALAH (Penyebab Error)
-                # padded = pad_sequences(seq, maxlen=100) 
-
-                # ✅ BENAR (Sesuai pesan error Anda: expected shape 60)
                 padded = pad_sequences(seq, maxlen=60) 
-                
                 probs = model.predict(padded)[0]
 
         # --- HASIL ---
