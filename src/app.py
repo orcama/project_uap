@@ -51,11 +51,11 @@ def load_transformer_model(model_path):
 @st.cache_resource
 def load_lstm_model(model_path):
     try:
+        # 1. Pengecekan Path
         if not os.path.exists(model_path):
             st.error(f"Path tidak ditemukan: {model_path}")
             return None
 
-        # Handle jika path adalah folder atau file langsung
         if model_path.endswith('.h5'):
             full_path = model_path
         else:
@@ -65,35 +65,54 @@ def load_lstm_model(model_path):
                 return None
             full_path = os.path.join(model_path, files[0])
 
-        # --- BAGIAN PERBAIKAN (PATCHING) ---
-        try:
-            # Percobaan load normal
-            model = tf.keras.models.load_model(full_path)
-        except TypeError as e:
-            if "batch_shape" in str(e):
-                # Jika error karena 'batch_shape', kita definisikan InputLayer kustom
-                # untuk menjembatani Keras 3 (disimpan) ke Keras 2 (runtime saat ini)
-                from tensorflow.keras.layers import InputLayer
+        # 2. DEFINISI CUSTOM OBJECTS (PATCHING KERAS 3 -> KERAS 2)
+        
+        # Patch A: InputLayer (Mengatasi error 'batch_shape')
+        from tensorflow.keras.layers import InputLayer
+        class PatchedInputLayer(InputLayer):
+            def __init__(self, batch_shape=None, dtype=None, **kwargs):
+                # Pindahkan batch_shape ke batch_input_shape (bahasa Keras 2)
+                if batch_shape is not None:
+                    kwargs['batch_input_shape'] = batch_shape
+                # Abaikan dtype policy kompleks, ambil float32 default
+                if dtype is not None:
+                    kwargs['dtype'] = 'float32' 
+                super().__init__(**kwargs)
 
-                class PatchedInputLayer(InputLayer):
-                    def __init__(self, batch_shape=None, **kwargs):
-                        # Pindahkan 'batch_shape' ke 'batch_input_shape' agar dikenali Keras 2
-                        if batch_shape is not None:
-                            kwargs['batch_input_shape'] = batch_shape
-                        super().__init__(**kwargs)
+        # Patch B: DTypePolicy (Mengatasi error 'Unknown dtype policy')
+        # Kita buat class palsu yang mewarisi Policy dari Keras 2
+        from tensorflow.keras.mixed_precision import Policy
+        class DTypePolicy(Policy):
+            def __init__(self, name="float32", **kwargs):
+                # Keras 3 mungkin mengirim dict atau string, kita paksa float32 agar aman
+                super().__init__(name="float32")
+            
+            @classmethod
+            def from_config(cls, config):
+                # Menerima config dari file .h5 dan mengembalikan instance baru
+                return cls(**config)
+            
+            def get_config(self):
+                return {"name": self.name}
 
-                # Load model dengan custom_objects
-                model = tf.keras.models.load_model(
-                    full_path, 
-                    custom_objects={'InputLayer': PatchedInputLayer}
-                )
-            else:
-                raise e # Jika errornya lain, biarkan error muncul
+        # 3. LOAD MODEL DENGAN PATCH & TANPA COMPILE
+        # compile=False sangat PENTING karena Optimizer Keras 3 sering gagal diload di Keras 2
+        # Kita hanya butuh model untuk prediksi (inference), jadi tidak butuh optimizer.
+        model = tf.keras.models.load_model(
+            full_path, 
+            custom_objects={
+                'InputLayer': PatchedInputLayer,
+                'DTypePolicy': DTypePolicy
+            },
+            compile=False 
+        )
         
         return model
-        
+
     except Exception as e:
         st.error(f"Error load LSTM: {e}")
+        # Tampilkan detail error di terminal juga untuk debugging
+        print(f"DETAIL ERROR LSTM: {e}")
         return None
 
 @st.cache_resource
@@ -131,12 +150,19 @@ if st.button("Analisis"):
                 probs = tf.nn.softmax(outputs.logits, axis=1).numpy()[0]
         
         # --- MODEL LSTM ---
+        # ... (Bagian LSTM Hybrid) ...
         elif selected_model_name == "LSTM Hybrid":
             model = load_lstm_model(model_path)
             tok = load_lstm_tokenizer()
             if model and tok:
                 seq = tok.texts_to_sequences([user_input])
-                padded = pad_sequences(seq, maxlen=100) # Sesuaikan maxlen!
+                
+                # ❌ SALAH (Penyebab Error)
+                # padded = pad_sequences(seq, maxlen=100) 
+
+                # ✅ BENAR (Sesuai pesan error Anda: expected shape 60)
+                padded = pad_sequences(seq, maxlen=60) 
+                
                 probs = model.predict(padded)[0]
 
         # --- HASIL ---
