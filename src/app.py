@@ -65,12 +65,12 @@ def load_lstm_model(model_path):
                 return None
             full_path = os.path.join(model_path, files[0])
 
-        # 2. DEFINISI CUSTOM OBJECTS (PATCHING KERAS 3 -> KERAS 2)
+        # 2. DEFINISI CUSTOM OBJECTS
         # Patch A: InputLayer (Mengatasi error 'batch_shape')
         from tensorflow.keras.layers import InputLayer
         class PatchedInputLayer(InputLayer):
             def __init__(self, batch_shape=None, dtype=None, **kwargs):
-                # Keras 3 mungkin mengirim batch_shape & dtype, kita tangani sesuai Keras 2
+                
                 if batch_shape is not None:
                     kwargs['batch_input_shape'] = batch_shape
                 # Abaikan dtype policy kompleks, ambil float32 default
@@ -79,11 +79,9 @@ def load_lstm_model(model_path):
                 super().__init__(**kwargs)
 
         # Patch B: DTypePolicy (Mengatasi error 'Unknown dtype policy')
-        # Kita buat class palsu yang mewarisi Policy dari Keras 2
         from tensorflow.keras.mixed_precision import Policy
         class DTypePolicy(Policy):
             def __init__(self, name="float32", **kwargs):
-                # Keras 3 mungkin mengirim dict atau string, kita paksa float32 agar aman
                 super().__init__(name="float32")
             
             @classmethod
@@ -95,8 +93,6 @@ def load_lstm_model(model_path):
                 return {"name": self.name}
 
         # 3. LOAD MODEL DENGAN PATCH & TANPA COMPILE
-        # compile=False sangat PENTING karena Optimizer Keras 3 sering gagal diload di Keras 2
-        # Kita hanya butuh model untuk prediksi (inference), jadi tidak butuh optimizer.
         model = tf.keras.models.load_model(
             full_path, 
             custom_objects={
@@ -110,7 +106,7 @@ def load_lstm_model(model_path):
 
     except Exception as e:
         st.error(f"Error load LSTM: {e}")
-        # Tampilkan detail error di terminal juga untuk debugging
+        # Tampilkan detail error di terminal untuk debugging
         print(f"DETAIL ERROR LSTM: {e}")
         return None
 
